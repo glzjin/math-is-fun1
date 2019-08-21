@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>markdown demo</title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/dingus.css" rel="stylesheet">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/commonmark.js"></script>
+    <script src="/js/Safe.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <script src="/js/purify.min.js"></script>
+    <script src="/api/config?callback=DOMPurify.setConfig"></script>
+  <script>
+    let htmlwriter = new commonmark.HtmlRenderer({ sourcepos: false });
+    let reader = new commonmark.Parser();
+    let html;
+    try {
+        html = JSON.parse(location.hash.substr(1,)); 
+        html = Safe_string(html, "");
+    }
+    catch (error) {
+        html = "";
+    }
+
+    function MK_parser(input) {
+        let clean = DOMPurify.sanitize(input);
+        let tmp_dom = reader.parse(clean);
+        html =  htmlwriter.render(tmp_dom);
+        return html;
+    }
+
+  </script>
+</head>
+<body>
+    <div class="container">
+        <div class="row" id="main">
+            <div class="col-md-6">
+                <textarea id="text"></textarea>
+            </div>
+            <div class="col-md-6" style="border: 1px; border-style: ridge;">
+                <div id="preview"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+    $("textarea").keyup(() => {
+        let Parsered = MK_parser($("textarea").val());
+        $("#preview").html(Parsered);
+        MathJax.Hub.Queue(["Typeset",MathJax.Hub,$("#preview")[0]]);
+    })
+    </script>
+</body>
+</html>

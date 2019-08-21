@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>send_message</title>
+</head>
+<body>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/dingus.css" rel="stylesheet">
+    <script src="/js/jquery.min.js"></script>
+    <script>
+        function setmessage() {
+            fetch("/setmessage", {
+                method: 'GET',
+                mode: "no-cors",
+                credentials: "include",
+            })
+            .then(res => {
+                return res.json();
+            })
+            .then(res => {
+                $("#pof")[0].innerText = `proof of work for ${res.hash} (proof of work is first 5 chars of md5(plain_text)) You should supply the plain-text`;
+            })
+        }
+        window.onload = setmessage;
+
+        function report() {
+            $("#res")[0].innerText = "sending...";
+            let tmp = []
+            for (let i of $("input")) {
+                tmp.push(encodeURIComponent(i.value));
+            }
+            let [link, text] = tmp;
+
+            fetch(`/sendmessage?text=${text}&link=${link}`, {
+                method: 'GET',
+                mode: "no-cors",
+                credentials: "include",
+            })
+            .then(res => {
+                return res.text();
+            })
+            .then(res => {
+                $("#res")[0].innerText = res;
+            })
+            .then(() => {
+                setmessage();
+            })
+            .catch(e => {
+                console.error(e);
+                $("#res")[0].innerText = "server error please wait";
+                setmessage();
+            })
+        }
+    </script>
+    <div class="container my-4">
+        <p></p>
+        <p></p>
+        <form>
+            <div class="form-group">
+                <label for="Input1">Link</label>
+                <div class="input-group">
+                    <span class="input-group-addon">http://47.110.128.101/challenge?</span>
+                    <input type="text" name="link" class="form-control" placeholder="Need admin to view the link">
+                </div>
+                <label onclick="setmessage" id="pof" for="Input2"></label>
+                <input type="text" name="text" class="form-control" placeholder="proof of work">
+            </div>
+            <button onclick="report()" type="button" class="btn btn-primary">Report</button>
+        </form>
+    </div>
+    <p id="res"></p>
+</body>
+</html>

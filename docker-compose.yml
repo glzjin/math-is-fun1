@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  web:
+    ports:
+      - 18880:80
+    build: ./
+    image: glzjin/sctf_2019_math_is_fun_1
+    environment:
+      - "FLAG=flag{glzjin_wants_a_girl_friend}"
